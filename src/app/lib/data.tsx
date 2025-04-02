@@ -16,6 +16,8 @@ import {
   UruguayFlag,
   GlobeFlag,
 } from "./flags";
+import { nanoid } from "nanoid";
+import { useGeolocated } from "react-geolocated";
 
 const api_url = process.env.NEXT_PUBLIC_API_URL;
 
@@ -200,14 +202,15 @@ export async function getFeriados(): Promise<any> {
     });
 
     return {
-      id: mes,
+      id: `${mes}-${index}`, // ID único para el mes
       label: mes.charAt(0).toUpperCase() + mes.slice(1),
       children: feriadosDelMes.map((feriado) => ({
-        id: feriado.nombre.toLowerCase().replace(/ /g, "-"),
-        label: feriado.nombre,
+        id: `${feriado.fecha}-${feriado.nombre}`, // Usa la fecha para asegurar unicidad
+        label: `${feriado.nombre} - ${feriado.fecha}`,
       })),
     };
   });
+
   return feriados;
 }
 
@@ -222,7 +225,7 @@ export async function getQuotes(): Promise<{
   const data: CotizacionData[] = json.map(
     (cotizacion: { nombre: string; compra: number }) => ({
       label: cotizacion.nombre,
-      value: cotizacion.compra, // Puedes usar `compra` o `venta` según lo que necesites
+      value: cotizacion.compra,
     })
   );
 
@@ -250,8 +253,9 @@ export async function getQuotes(): Promise<{
       }
 
       return {
+        id: nanoid(),
         name: cotizacion.nombre,
-        value: cotizacion.compra, // Puedes usar `compra` o `venta` según lo que necesites
+        value: cotizacion.compra,
         flag: flagComponent,
         color: getRandomColor(), // Función para generar colores aleatorios o predefinidos
       };
@@ -259,4 +263,15 @@ export async function getQuotes(): Promise<{
   );
 
   return { data, countries };
+}
+
+export async function getWeather(lat: number, lon: number): Promise<any> {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_WEATHER_URL}?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&units=metric&lang=es`
+  );
+
+  if (!response.ok)
+    throw new Error("No se pudo obtener la información del clima.");
+
+  return response.json();
 }

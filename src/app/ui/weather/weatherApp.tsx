@@ -1,44 +1,19 @@
-import { useGeolocated } from "react-geolocated";
-import { useEffect, useState } from "react";
+import WeatherCard from "./weatherCard";
+import { Suspense } from "react";
+import { getWeather } from "@/app/lib/data";
+import { useClientLocation } from "@/app/lib/utils";
 
-const WeatherApp = () => {
-  const { coords, isGeolocationAvailable, isGeolocationEnabled } =
-    useGeolocated();
+export default async function Weather() {
+  const { coords, error } = useClientLocation();
 
-  const [weatherData, setWeatherData] = useState<any>(null);
+  if (error) return <div>{error}</div>;
+  if (!coords) return <div>Obteniendo ubicación...</div>;
 
-  useEffect(() => {
-    if (coords) {
-      const { latitude, longitude } = coords;
-      const fetchWeatherData = async () => {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WEATHER_URL}lat=${latitude}&lon=${longitude}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}`
-        );
-        const data = await response.json();
-        setWeatherData(data);
-      };
-
-      fetchWeatherData();
-    }
-  }, [coords]);
-
-  if (!isGeolocationAvailable) return <div>Geolocation is not available</div>;
-  if (!isGeolocationEnabled) return <div>Geolocation is not enabled</div>;
+  const dataPromise = getWeather(coords.latitude, coords.longitude);
 
   return (
-    <div>
-      <h1>Weather App</h1>
-      {weatherData ? (
-        <div>
-          <h2>{weatherData.name}</h2>
-          <p>{weatherData.weather[0].description}</p>
-          <p>{weatherData.main.temp}°C</p>
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <WeatherCard dataPromise={dataPromise} />
+    </Suspense>
   );
-};
-
-export default WeatherApp;
+}

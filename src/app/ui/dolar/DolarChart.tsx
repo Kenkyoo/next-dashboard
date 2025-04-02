@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { useTheme } from "@mui/material/styles";
 import Card from "@mui/material/Card";
@@ -6,6 +8,13 @@ import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import { LineChart } from "@mui/x-charts/LineChart";
+import { use } from "react";
+import { DolarData } from "../../lib/types";
+import { getLast12Months } from "../../lib/utils";
+
+interface DolarChartProps {
+  series: DolarData[]; // ✅ Acepta una promesa
+}
 
 function AreaGradient({ color, id }: { color: string; id: string }) {
   return (
@@ -33,10 +42,15 @@ function getDaysInMonth(month: number, year: number) {
   return days;
 }
 
-export default function DolarChart({ series }: { series: any[] }) {
+export default function DolarChart({
+  series,
+}: {
+  series: Promise<DolarData[]>;
+}) {
+  // ✅ Acepta una promesaDolarChartProps) {
   const theme = useTheme();
-  const data = getDaysInMonth(4, 2024);
-
+  const data = getLast12Months();
+  const allSeries = use(series);
   const colorPalette = [
     theme.palette.primary.light,
     theme.palette.primary.main,
@@ -47,7 +61,7 @@ export default function DolarChart({ series }: { series: any[] }) {
     <Card variant="outlined" sx={{ width: "100%" }}>
       <CardContent>
         <Typography component="h2" variant="subtitle2" gutterBottom>
-          Sessions
+          Cotización del Dolar
         </Typography>
         <Stack sx={{ justifyContent: "space-between" }}>
           <Stack
@@ -64,7 +78,7 @@ export default function DolarChart({ series }: { series: any[] }) {
             <Chip size="small" color="success" label="+35%" />
           </Stack>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            Sessions per day for the last 30 days
+            Últimos 12 meses
           </Typography>
         </Stack>
         <LineChart
@@ -76,7 +90,7 @@ export default function DolarChart({ series }: { series: any[] }) {
               tickInterval: (index, i) => (i + 1) % 5 === 0,
             },
           ]}
-          series={series}
+          series={allSeries}
           height={250}
           margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
           grid={{ horizontal: true }}

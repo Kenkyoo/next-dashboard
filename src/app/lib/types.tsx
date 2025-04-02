@@ -42,6 +42,11 @@ export interface CotizacionData {
   value: number;
 }
 
+export interface PieCenterLabelProps {
+  primaryText: string;
+  secondaryText: string;
+}
+
 export interface WeatherData {
   name: string;
   temp: number;
@@ -54,6 +59,17 @@ export type StatCardProps = {
   interval: string;
   trend: "up" | "down" | "neutral";
   data: number[];
+};
+
+export interface StyledTextProps {
+  variant: "primary" | "secondary";
+}
+
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
 };
 
 export const meses = [

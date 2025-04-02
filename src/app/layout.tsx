@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Suspense } from "react";
+import { inter } from "@/app/ui/fonts";
+import { SessionProvider } from "next-auth/react";
+import AppTheme from "@/shared-theme/AppTheme";
+import CssBaseline from "@mui/material/CssBaseline";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,13 +12,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  session,
 }: Readonly<{
   children: React.ReactNode;
+  session?: any;
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      <body className={`${inter.className} antialiased`}>
+        <AppTheme>
+          <CssBaseline enableColorScheme />
+          <SessionProvider session={session}>
+            <Suspense fallback={<p>Loading...</p>}>{children}</Suspense>
+          </SessionProvider>
+        </AppTheme>
       </body>
     </html>
   );

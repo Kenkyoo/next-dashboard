@@ -1,3 +1,5 @@
+import "flag-icons/css/flag-icons.min.css";
+
 export function UsaFlag() {
   return <span className="fi fi-us"></span>;
 }

@@ -1,3 +1,5 @@
+import { useGeolocated } from "react-geolocated";
+
 export function getLast12Months(): string[] {
   const months: string[] = [];
   const currentDate = new Date();
@@ -17,4 +19,16 @@ export function getLast12Months(): string[] {
 export function getRandomColor() {
   const hue = Math.floor(Math.random() * 360);
   return `hsl(${hue}, 50%, 50%)`;
+}
+
+export async function useClientLocation() {
+  const { coords, isGeolocationAvailable, isGeolocationEnabled } =
+    useGeolocated();
+
+  if (!isGeolocationAvailable)
+    return { error: "La geolocalización no está disponible." };
+  if (!isGeolocationEnabled)
+    return { error: "Por favor, habilita la geolocalización." };
+
+  return { coords, error: null };
 }
